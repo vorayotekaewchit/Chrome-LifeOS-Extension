@@ -2,17 +2,25 @@
   "manifest_version": 3,
   "name": "LifeOS Extension",
   "version": "1.0.0",
-  "description": "Your personal life management extension",
+  "description": "Stop tracking everything. Start finishing something. Three missions a day.",
   "action": {
     "default_popup": "popup.html",
     "default_title": "LifeOS"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": [
-    "storage"
+    "storage",
+    "alarms",
+    "notifications"
   ],
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; style-src 'self' 'unsafe-inline';"
   }
 }

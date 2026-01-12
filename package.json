@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp manifest.json dist/",
+    "build": "vite build && cp manifest.json dist/ && cp public/background.js dist/ && bash scripts/create-icons.sh",
     "build:extension": "npm run build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"

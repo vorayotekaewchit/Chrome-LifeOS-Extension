@@ -20,7 +20,30 @@ export default defineConfig({
         chunkFileNames: 'assets/[name].js',
         assetFileNames: 'assets/[name].[ext]',
       },
+      // Exclude the Life-OS-Productivity-App folder from build
+      external: (id) => {
+        return id.includes('Life-OS-Productivity-App') || id.includes('unpkg.com');
+      },
     },
     emptyOutDir: true,
+    // Ensure all dependencies are bundled
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
+  // Prevent loading external resources
+  server: {
+    fs: {
+      // Restrict file system access
+      strict: true,
+      // Deny access to Life-OS-Productivity-App folder
+      deny: ['**/Life-OS-Productivity-App/**'],
+    },
+  },
+  // Resolve configuration
+  resolve: {
+    alias: {
+      // Ensure we don't accidentally import from Life-OS-Productivity-App
+    },
   },
 });
