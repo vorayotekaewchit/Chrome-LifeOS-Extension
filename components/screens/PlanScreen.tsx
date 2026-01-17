@@ -36,12 +36,12 @@ export function PlanScreen({ missions, streak, onStartDay }: PlanScreenProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="space-y-0.5"
+          className="space-y-1"
         >
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs font-medium text-neutral-600">
             {missions.length} {missions.length === 1 ? 'mission' : 'missions'} • {totalDuration} min total
           </p>
-          <p className="text-[10px] text-neutral-400">
+          <p className="text-[11px] text-neutral-500 italic">
             You showed up today.
           </p>
         </motion.div>
@@ -50,7 +50,7 @@ export function PlanScreen({ missions, streak, onStartDay }: PlanScreenProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mission-card mission-card-divider"
+          className="mission-card mission-card-divider bg-white/80 backdrop-blur-sm shadow-sm"
         >
           {missions.map((mission, idx) => (
             <motion.div
@@ -69,7 +69,7 @@ export function PlanScreen({ missions, streak, onStartDay }: PlanScreenProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           onClick={onStartDay}
-          className="w-full px-4 py-2.5 text-sm rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-smooth shadow-md shadow-orange-500/20 hover-lift"
+          className="w-full px-4 py-2.5 text-sm font-semibold rounded-lg bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]"
         >
           Start day
         </motion.button>

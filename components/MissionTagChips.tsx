@@ -21,10 +21,10 @@ export function MissionTagChips({ selectedTag, onSelect }: MissionTagChipsProps)
         <button
           key={name}
           onClick={() => onSelect(name)}
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-all text-xs ${
+          className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border transition-all duration-200 text-xs font-medium ${
             selectedTag === name 
-              ? color 
-              : 'bg-white text-neutral-500 border-neutral-200 hover:border-neutral-300'
+              ? `${color} shadow-sm scale-105` 
+              : 'bg-white text-neutral-500 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 hover:scale-105 active:scale-95'
           }`}
         >
           <Icon className="w-3 h-3" />

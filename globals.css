@@ -282,6 +282,19 @@ html, body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Enhanced button base styles */
+.btn-primary {
+  @apply px-4 py-2.5 text-sm font-medium rounded-lg bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md;
+}
+
+.btn-secondary {
+  @apply px-4 py-2.5 text-sm font-medium rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 active:bg-neutral-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-ghost {
+  @apply px-3 py-2 text-sm font-medium rounded-lg text-neutral-600 hover:bg-neutral-100 active:bg-neutral-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
 /* Focus ring utilities - Tailwind @apply directive */
 .focus-ring {
   @apply outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2;

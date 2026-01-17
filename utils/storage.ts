@@ -42,7 +42,8 @@ export function isAppState(value: unknown): value is AppState {
     obj.last7Days.every((item) => typeof item === "number") &&
     typeof obj.currentView === "string" &&
     ["input", "plan", "focus", "dashboard"].includes(obj.currentView) &&
-    typeof obj.lastResetDate === "string"
+    typeof obj.lastResetDate === "string" &&
+    (typeof obj.weekStartDate === "string" || obj.weekStartDate === undefined)
   );
 }
 
@@ -65,6 +66,7 @@ export interface AppState {
   last7Days: number[];
   currentView: "input" | "plan" | "focus" | "dashboard";
   lastResetDate: string;
+  weekStartDate: string; // Date string of Monday for the current week
 }
 
 /**
@@ -144,4 +146,26 @@ export async function safeSetToStorage<T>(key: string, value: T): Promise<boolea
     console.error(`Failed to write to storage item "${key}":`, error);
     return false;
   }
+}
+
+/**
+ * Get the Monday of the current week as a date string
+ * Returns the date string for the Monday of the week containing the given date
+ */
+export function getWeekStartDate(date: Date = new Date()): string {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  const monday = new Date(d.setDate(diff));
+  monday.setHours(0, 0, 0, 0);
+  return monday.toDateString();
+}
+
+/**
+ * Get the day index (0-6) for Monday-Sunday
+ * 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+ */
+export function getDayIndex(date: Date = new Date()): number {
+  const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  return day === 0 ? 6 : day - 1; // Convert to Monday=0, Sunday=6
 }

@@ -69,7 +69,7 @@ export function InputScreen({ onGeneratePlan, previousMissions }: InputScreenPro
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             onClick={importFromYesterday}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg border border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50 active:bg-neutral-100 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Import from yesterday
@@ -89,7 +89,7 @@ export function InputScreen({ onGeneratePlan, previousMissions }: InputScreenPro
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="flex items-start gap-2 p-3 rounded-lg bg-neutral-50 border border-neutral-100"
+                className="flex items-start gap-2 p-3 rounded-lg bg-gradient-to-br from-neutral-50 to-white border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex-1">
                   <h3 className="text-sm font-medium text-neutral-900 mb-0.5">{mission.title}</h3>
@@ -114,7 +114,7 @@ export function InputScreen({ onGeneratePlan, previousMissions }: InputScreenPro
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="space-y-3 p-4 rounded-lg border-2 border-dashed border-neutral-200"
+            className="space-y-3 p-4 rounded-xl border-2 border-dashed border-neutral-200 bg-gradient-to-br from-neutral-50/50 to-white hover:border-neutral-300 transition-colors duration-200"
           >
             <div>
               <label className="block text-xs font-medium text-neutral-700 mb-1.5">
@@ -153,7 +153,7 @@ export function InputScreen({ onGeneratePlan, previousMissions }: InputScreenPro
             <button
               onClick={addMission}
               disabled={!currentMission.title || !currentMission.tag}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg bg-neutral-100 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Mission
@@ -167,7 +167,7 @@ export function InputScreen({ onGeneratePlan, previousMissions }: InputScreenPro
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={handleGeneratePlan}
-            className="w-full px-4 py-2.5 text-sm rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-md shadow-orange-500/20"
+            className="w-full px-4 py-2.5 text-sm font-semibold rounded-lg bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]"
           >
             Generate plan
           </motion.button>

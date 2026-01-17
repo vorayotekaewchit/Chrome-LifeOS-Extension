@@ -1,4 +1,5 @@
 import { Target, Zap, ChartBar } from "lucide-react";
+import { motion } from "motion/react";
 
 export type Tab = "plan" | "focus" | "dashboard";
 
@@ -15,20 +16,28 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
   ];
   
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-14 bg-white/95 backdrop-blur-md border-t border-neutral-100 z-50 shadow-lg">
+    <div className="absolute bottom-0 left-0 right-0 h-14 bg-white/98 backdrop-blur-lg border-t border-neutral-200/80 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
       <div className="flex items-center justify-around h-full px-1">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => onTabChange(id)}
-            className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 transition-all duration-300 ${
+            className={`flex flex-col items-center justify-center gap-1 py-1.5 px-4 rounded-lg transition-all duration-200 relative ${
               activeTab === id 
-                ? 'text-blue-600 scale-105' 
-                : 'text-neutral-400 hover:text-neutral-600'
+                ? 'text-orange-600 scale-105' 
+                : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50/50'
             }`}
           >
-            <Icon className="w-4 h-4" />
-            <span className="text-[9px] font-medium">{label}</span>
+            {activeTab === id && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-orange-50 rounded-lg -z-10"
+                initial={false}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              />
+            )}
+            <Icon className={`w-4 h-4 ${activeTab === id ? 'drop-shadow-sm' : ''}`} />
+            <span className={`text-[9px] font-medium ${activeTab === id ? 'font-semibold' : ''}`}>{label}</span>
           </button>
         ))}
       </div>

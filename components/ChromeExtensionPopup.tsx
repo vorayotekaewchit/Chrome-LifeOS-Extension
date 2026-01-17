@@ -4,7 +4,8 @@ import { PlanScreen } from "./screens/PlanScreen";
 import { FocusScreen } from "./screens/FocusScreen";
 import { DashboardScreen } from "./screens/DashboardScreen";
 import { BottomTabBar, type Tab } from "./BottomTabBar";
-import { safeGetFromStorage, safeSetToStorage, isAppState, type Mission, type AppState } from "../utils/storage";
+import { safeGetFromStorage, safeSetToStorage, isAppState, type Mission, type AppState, getWeekStartDate, getDayIndex } from "../utils/storage";
+import { useLifeOStore, hydrateLifeOState } from "../hooks/useLifeOState";
 
 const INITIAL_STATE: AppState = {
   missions: [],
@@ -12,19 +13,31 @@ const INITIAL_STATE: AppState = {
   streak: 0,
   last7Days: [0, 0, 0, 0, 0, 0, 0],
   currentView: "input",
-  lastResetDate: new Date().toDateString()
+  lastResetDate: new Date().toDateString(),
+  weekStartDate: getWeekStartDate()
 };
 
 export function ChromeExtensionPopup() {
   const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<AppState>(INITIAL_STATE);
-  const [activeTab, setActiveTab] = useState<Tab>("plan");
+  const { currentPage: activeTab, setPage } = useLifeOStore();
   
   // Load state on mount
   useEffect(() => {
     const loadState = async () => {
+      // Hydrate UI state first
+      await hydrateLifeOState();
       const savedState = await safeGetFromStorage<AppState>("lifeOS", isAppState, INITIAL_STATE);
-      setState(savedState);
+      
+      // Check if we need to reset for a new week (Monday) during load
+      const currentWeekStart = getWeekStartDate();
+      const needsWeeklyReset = !savedState.weekStartDate || savedState.weekStartDate !== currentWeekStart;
+      
+      setState({
+        ...savedState,
+        weekStartDate: savedState.weekStartDate || currentWeekStart,
+        last7Days: needsWeeklyReset ? [0, 0, 0, 0, 0, 0, 0] : savedState.last7Days
+      });
       setIsLoading(false);
     };
     loadState();
@@ -37,6 +50,20 @@ export function ChromeExtensionPopup() {
     }
   }, [state, isLoading]);
   
+  // Check if we need to reset for a new week (Monday) - only runs when weekStartDate changes
+  useEffect(() => {
+    if (isLoading) return; // Don't run during initial load
+    
+    const currentWeekStart = getWeekStartDate();
+    if (state.weekStartDate && state.weekStartDate !== currentWeekStart) {
+      setState(prev => ({
+        ...prev,
+        last7Days: [0, 0, 0, 0, 0, 0, 0], // Reset weekly streak on Monday
+        weekStartDate: currentWeekStart
+      }));
+    }
+  }, [state.weekStartDate, isLoading]);
+
   // Check if we need to reset for a new day
   useEffect(() => {
     const today = new Date().toDateString();
@@ -45,9 +72,17 @@ export function ChromeExtensionPopup() {
         // Only reset if there were missions yesterday
         if (prev.missions.length === 0) return prev;
         
-        // Update last 7 days with yesterday's count
+        // Get yesterday's completed count
         const completedCount = prev.missions.filter(m => m.completed).length;
-        const newLast7Days = [...prev.last7Days.slice(1), completedCount];
+        
+        // Update the specific day in last7Days based on yesterday's day index
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayDayIndex = getDayIndex(yesterday);
+        
+        // Update yesterday's count in the array
+        const newLast7Days = [...prev.last7Days];
+        newLast7Days[yesterdayDayIndex] = completedCount;
         
         // If at least one mission was completed, maintain or increment streak
         const newStreak = completedCount >= 1 ? prev.streak + 1 : 0;
@@ -74,7 +109,7 @@ export function ChromeExtensionPopup() {
       missions,
       currentView: "plan"
     }));
-    setActiveTab("plan");
+    setPage("plan");
   };
   
   /**
@@ -83,23 +118,47 @@ export function ChromeExtensionPopup() {
    */
   const handleStartDay = () => {
     setState(prev => ({ ...prev, currentView: "focus" }));
-    setActiveTab("focus");
+    setPage("focus");
   };
   
   /**
    * Marks a mission as completed and awards XP.
    * Updates the mission's completed status and timestamp.
+   * Also updates the current day's count in last7Days for real-time momentum display.
    */
-  const handleCompleteMission = (missionId: string, feeling?: "good" | "neutral" | "bad") => {
-    setState(prev => ({
-      ...prev,
-      missions: prev.missions.map(m => 
+  const handleCompleteMission = (missionId: string, _feeling?: "good" | "neutral" | "bad") => {
+    setState(prev => {
+      const updatedMissions = prev.missions.map(m => 
         m.id === missionId 
           ? { ...m, completed: true, completedAt: new Date() }
           : m
-      ),
-      xp: prev.xp + 10 // Award 10 XP per completed mission
-    }));
+      );
+      
+      // Count completed missions for today
+      const todayCompletedCount = updatedMissions.filter(m => m.completed).length;
+      
+      // Get current day index (0-6 for Monday-Sunday)
+      const todayDayIndex = getDayIndex();
+      
+      // Update last7Days array with today's completed count
+      const newLast7Days = [...prev.last7Days];
+      newLast7Days[todayDayIndex] = todayCompletedCount;
+      
+      // Debug: Log the update
+      console.log('Mission completed:', {
+        todayDayIndex,
+        todayCompletedCount,
+        newLast7Days,
+        dayName: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][todayDayIndex]
+      });
+      
+      return {
+        ...prev,
+        missions: updatedMissions,
+        xp: prev.xp + 10, // Award 10 XP per completed mission
+        last7Days: newLast7Days
+      };
+    });
   };
   
   /**
@@ -132,7 +191,7 @@ export function ChromeExtensionPopup() {
       currentView: "dashboard",
       streak: completedCount >= 1 ? prev.streak + 1 : prev.streak
     }));
-    setActiveTab("dashboard");
+    setPage("dashboard");
   };
   
   /**
@@ -145,11 +204,11 @@ export function ChromeExtensionPopup() {
       missions: [],
       currentView: "input"
     }));
-    setActiveTab("plan");
+    setPage("plan");
   };
   
   const handleTabChange = (tab: Tab) => {
-    setActiveTab(tab);
+    setPage(tab);
     
     // Map tab to view
     if (tab === "plan") {
@@ -170,8 +229,14 @@ export function ChromeExtensionPopup() {
   
   if (isLoading) {
     return (
-      <div className="extension-container items-center justify-center">
-        <div className="text-neutral-500">Loading...</div>
+      <div className="extension-container items-center justify-center bg-gradient-to-br from-neutral-50 to-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 border-4 border-orange-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+          </div>
+          <p className="text-sm font-medium text-neutral-600">Loading your day...</p>
+        </div>
       </div>
     );
   }
